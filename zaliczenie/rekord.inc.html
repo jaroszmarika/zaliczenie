@@ -1,0 +1,58 @@
+<html>
+  <head>
+  
+    <meta charset="utf-8" />
+  </head>
+  <body>
+    <h1>Wyszukiwanie osób po nazwisku</h1>
+    <form action="wyniki.php" method="post">
+      <br /><br />
+      Nazwisko szukanej osoby:
+      <input type="text" name="wyrazenie" />
+      <input type="submit" name="wyszukaj" />
+    </form>
+  </body>
+</html>
+
+<?php
+
+$wyrazenie = $_POST['wyrazenie'];
+$wyrazenie = trim($wyrazenie);
+
+ if (!$metoda || !$wyrazenie)
+      {
+        echo 'Brak parametrów wyszukiwania, wróć do poprzednej strony i spróbuj ponownie!';
+        exit;
+      }
+
+if (!get_magic_quotes_gpc()) {
+$metoda_szukania = addslashes($metoda_szukania);
+$wyrazenie = addslashes($wyrazenie);
+}
+@ $db = new mysqli('id', 'imie', 'nazwisko', 'miejsce_urodzenia', 'data', 'wiek');
+if (mysqli_connect_errno()) {
+echo 'utracono połączenie z bazą. Spróbuj ponownie później';
+exit;
+}
+$zapytanie = "select * from dane_osobowe where ".$metoda_szukania." like '%".$wyrazenie."%'";
+$wynik = $db->query($zapytanie);
+ 
+$ile_znalezionych = $wynik->num_rows;
+echo "<p>Ilość znalezionych pozycji: ".$ile_znalezionych."</p>";
+for ($i=0; $i <$ile_znalezionych; $i++) {
+$wiersz = $wynik->fetch_assoc();
+echo "<p>".($i+1).". Imie: ";
+echo stripslashes($wiersz['imie']);
+echo "<br>Nazwisko: ";
+echo stripslashes($wiersz['nazwisko']);
+echo "<br>Miejsce urodzenia: ";
+echo stripslashes($wiersz['miejsce_urodzenia']);
+echo "<br>Data: ";
+echo stripslashes($wiersz['data']);
+echo "<br>Wiek: ";
+echo stripslashes($wiersz['wiek']);
+echo "</p>";
+}
+$wynik->free();
+$db->close();
+?>
